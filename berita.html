@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berita & Prestasi - SMPN 4 Pare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-graduation-cap" style="color: var(--secondary-color); font-size: 2em;"></i>
+                <h1>SMPN 4 Pare</h1>
+            </div>
+            <nav>
+                <ul id="nav-menu">
+                    <li><a href="index.html">Beranda</a></li>
+                    <li><a href="profil.html">Profil Sekolah</a></li>
+                    <li><a href="berita.html" class="active">Berita & Pengumuman</a></li>
+                    <li><a href="galeri.html">Galeri OCB</a></li>
+                    <li><a href="kontak.html">Kontak</a></li>
+                </ul>
+            </nav>
+            <div class="nav-toggle"><i class="fas fa-bars"></i></div>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <h2 class="section-title">Prestasi Siswa Terbaru</h2>
+            
+            <div class="berita-grid">
+                <article class="berita-card" style="background: var(--light-bg);">
+                    <img src="https://via.placeholder.com/400x250?text=FLS2N+2023" alt="FLS2N 2023" class="berita-thumb">
+                    <h4>Juara 1 Menyanyi FLS2N Kabupaten Kediri 2023</h4>
+                    <p class="meta"><i class="fas fa-calendar-alt"></i> 15 November 2023</p>
+                    <p>Kebanggaan sekolah datang dari bidang seni suara, menunjukkan bakat luar biasa siswa dalam ajang bergengsi ini.</p>
+                    <a href="#" class="read-more">Lihat Detail <i class="fas fa-arrow-right"></i></a>
+                </article>
+
+                <article class="berita-card" style="background: var(--light-bg);">
+                    <img src="https://via.placeholder.com/400x250?text=Pencak+Silat+2022" alt="Pencak Silat 2022" class="berita-thumb">
+                    <h4>Juara 2 Kejuaraan Pencak Silat Dandim Kediri 2022</h4>
+                    <p class="meta"><i class="fas fa-calendar-alt"></i> 10 Desember 2022</p>
+                    <p>Prestasi di bidang olahraga bela diri, mencerminkan kedisiplinan dan semangat juang siswa SMPN 4 Pare.</p>
+                    <a href="#" class="read-more">Lihat Detail <i class="fas fa-arrow-right"></i></a>
+                </article>
+
+                <article class="berita-card" style="background: var(--light-bg);">
+                    <img src="https://via.placeholder.com/400x250?text=Karnival+2023" alt="Karnival Heritage" class="berita-thumb">
+                    <h4>Juara 3 "Best Performance Karnival Heritage Culture Pare" 2023</h4>
+                    <p class="meta"><i class="fas fa-calendar-alt"></i> 05 Agustus 2023</p>
+                    <p>Pengakuan atas kreativitas dan kemampuan siswa dalam melestarikan serta menampilkan budaya lokal.</p>
+                    <a href="#" class="read-more">Lihat Detail <i class="fas fa-arrow-right"></i></a>
+                </article>
+            </div>
+            
+            <h2 class="section-title" style="margin-top: 60px;">Pengumuman Sekolah</h2>
+            
+            <div class="pengumuman-list">
+                <div class="pengumuman-item">
+                    <span class="tanggal"><i class="fas fa-calendar-day"></i> 25 Maret 2025</span>
+                    <h4>Kegiatan Sosial: Pembagian Takjil</h4>
+                    <p>SMPN 4 Pare melaksanakan kegiatan pembagian takjil sebagai bentuk kepedulian sosial di Bulan Ramadhan.</p>
+                </div>
+                <div class="pengumuman-item">
+                    <span class="tanggal"><i class="fas fa-calendar-day"></i> 10 Juli 2025</span>
+                    <h4>Pendaftaran Siswa Baru (PPDB) Tahun Ajaran 2025/2026 Dibuka</h4>
+                    <p>Informasi dan persyaratan lengkap PPDB dapat dilihat pada link berikut.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <style>
+        .berita-grid {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        .berita-thumb {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+        .pengumuman-list {
+            display: grid;
+            gap: 15px;
+        }
+        .pengumuman-item {
+            background: var(--light-bg);
+            padding: 20px;
+            border-left: 5px solid var(--primary-color);
+            border-radius: 4px;
+        }
+        .pengumuman-item h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        .pengumuman-item .tanggal {
+            font-size: 0.9em;
+            color: #888;
+            display: block;
+            margin-bottom: 10px;
+        }
+    </style>
+
+    <footer>
+        <div class="container footer-grid">...</div>
+        <div class="footer-bottom">...</div>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
