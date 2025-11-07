@@ -1,4 +1,4 @@
-/* style.css (Diperbarui) */
+/* style.css (Kode Lengkap dan Responsif) */
 
 /* 1. Reset dan Font Dasar */
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Playfair+Display:wght@700&display=swap');
@@ -124,7 +124,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* 4. Section Konten (Cards, Grid, Tabel Baru) */
+/* 4. Section Konten (Cards, Grid, Tabel) */
 
 /* Umum untuk Card */
 .feature-grid {
@@ -152,10 +152,10 @@ body {
 /* Gaya Tabel Data Sekolah */
 .data-table {
     width: 100%;
-    border-collapse: separate; /* Menggunakan separate untuk radius border */
+    border-collapse: separate; 
     border-spacing: 0;
     margin-top: 20px;
-    overflow: hidden; /* Penting agar border radius terlihat */
+    overflow: hidden; 
     border-radius: 8px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
@@ -171,7 +171,7 @@ body {
 }
 
 .data-table tr:hover td {
-    background-color: #e6e6e6; /* Warna terang saat hover */
+    background-color: #e6e6e6; 
 }
 
 .data-table td:first-child {
@@ -188,6 +188,64 @@ body {
     border-radius: 4px;
     font-style: italic;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Khusus Guru & Staf Grid */
+.guru-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    padding-bottom: 60px;
+}
+
+.guru-card {
+    text-align: center;
+    background-color: var(--color-bg-light);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.guru-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.guru-info {
+    padding: 15px;
+}
+
+.guru-info h4 {
+    color: var(--color-primary);
+    margin-bottom: 5px;
+}
+
+/* Khusus PPDB */
+.ppdb-section {
+    background-color: var(--color-bg-light);
+    padding: 60px 0;
+    text-align: center;
+    border-radius: 8px;
+    margin-bottom: 40px;
+}
+
+.ppdb-section ul {
+    list-style: none;
+    padding: 0;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.ppdb-section li {
+    background-color: var(--color-white);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border-left: 5px solid var(--color-primary);
+    text-align: left;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    font-weight: 600;
 }
 
 /* 5. Footer Modern */
@@ -219,4 +277,101 @@ body {
 
 .footer a:hover {
     color: var(--color-secondary);
+}
+
+/* ---------------------------------------------------- */
+/* 6. Responsiveness untuk Mobile (Max-width: 768px) */
+/* ---------------------------------------------------- */
+
+@media (max-width: 992px) {
+    /* Menyesuaikan Hero Section */
+    .hero {
+        height: 60vh;
+    }
+    .hero h1 {
+        font-size: 2.5rem;
+    }
+    .hero p {
+        font-size: 1rem;
+    }
+
+    /* Mengubah layout utama dari flex menjadi block untuk mobile/tablet */
+    .container > div {
+        flex-direction: column;
+    }
+    .feature-grid {
+        flex-direction: column;
+    }
+    .feature-card {
+        margin-bottom: 15px;
+    }
+    .contact-grid {
+        flex-direction: column;
+    }
+    .footer-content {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    .footer-section h4 {
+        margin-top: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    /* Penyesuaian Navigasi */
+    .nav-links {
+        display: none; /* Sembunyikan link nav di mobile (perlu JavaScript untuk membuat menu burger) */
+    }
+    .navbar {
+        justify-content: center; /* Pusatkan logo di mobile */
+    }
+
+    /* Penyesuaian Sambutan KS */
+    .container > div:first-of-type {
+        flex-direction: column;
+    }
+
+    /* Mengubah Tabel Data Sekolah menjadi Tampilan Card Vertikal */
+    .data-table, .data-table tbody, .data-table tr, .data-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .data-table tr {
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .data-table td {
+        padding: 10px 15px;
+        border: none;
+        text-align: right;
+        padding-left: 50%;
+        position: relative;
+        background-color: var(--color-white) !important; /* Override hover warna */
+    }
+    
+    .data-table tr:nth-child(even) td {
+        background-color: var(--color-bg-light) !important;
+    }
+
+    .data-table td:before {
+        content: attr(data-label); /* Menggunakan data-label untuk menampilkan judul kolom */
+        position: absolute;
+        left: 10px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+    
+    /* Hilangkan efek hover baris tabel di mobile, fokuskan pada card */
+    .data-table tr:hover td {
+        background-color: initial; 
+    }
 }
