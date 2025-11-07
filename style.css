@@ -220,3 +220,69 @@ body {
 .footer a:hover {
     color: var(--color-secondary);
 }
+
+/* style.css (Tambahan untuk Section Budaya Sekolah) */
+
+.culture-grid {
+    display: flex;
+    justify-content: space-around;
+    gap: 30px;
+    padding-bottom: 60px;
+}
+
+.culture-card {
+    flex: 1;
+    background-color: var(--color-white);
+    border: 1px solid #e0e0e0;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.culture-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.culture-card .icon {
+    font-size: 3rem;
+    color: var(--color-primary);
+    margin-bottom: 15px;
+    display: inline-block;
+}
+
+.culture-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    margin-bottom: 10px;
+}
+
+.culture-card p {
+    font-size: 0.95rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.culture-card .btn-secondary {
+    background-color: var(--color-secondary);
+    color: var(--color-primary);
+    padding: 8px 20px;
+    text-decoration: none;
+    font-weight: 600;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.culture-card .btn-secondary:hover {
+    background-color: var(--color-accent-hover);
+}
+
+/* Responsiveness untuk culture-grid */
+@media (max-width: 992px) {
+    .culture-grid {
+        flex-direction: column;
+    }
+}
