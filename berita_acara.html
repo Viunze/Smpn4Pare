@@ -3,118 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Berita & Prestasi | SMPN 4 Pare</title>
+    <title>Berita & Galeri | SMPN 4 Pare</title>
+    <link rel="icon" href="https://files.catbox.moe/uatb93.png" type="image/png">
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <style>
-        .prestasi-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-            padding-bottom: 50px;
-        }
-        .prestasi-card {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            transition: transform 0.3s ease;
-        }
-        .prestasi-card:hover {
-            transform: translateY(-5px);
-        }
-        .prestasi-card-body {
-            padding: 20px;
-        }
-        .prestasi-card-body h3 {
-            color: var(--color-primary);
-            margin-bottom: 10px;
-        }
-    </style>
 </head>
 <body>
     <header class="header">
         <div class="navbar">
-            <div class="logo"><a href="index.html">SMPN 4 Pare</a></div>
+            <div class="logo">
+                <a href="index.html" class="logo-container">
+                    <img src="https://files.catbox.moe/uatb93.png" alt="Logo SMPN 4 Pare" class="header-logo">
+                    <span>SMPN 4 Pare</span>
+                </a>
+            </div>
             <nav class="nav-links">
                 <a href="index.html">Beranda</a>
                 <a href="tentang_kami.html">Profil Sekolah</a>
                 <a href="guru_staf.html">Guru & Staf</a>
                 <a href="berita_acara.html">Berita & Galeri</a>
-                <a href="ppdb.html">PPDB</a>
+                <a href="https://wa.me/6285655662935?text=Assalamualaikum.%20Saya%20ingin%20bertanya%20tentang%20pendaftaran%20siswa%20baru%20di%20SMPN%204%20Pare." target="_blank">PPDB</a>
                 <a href="kontak.html">Kontak</a>
             </nav>
         </div>
     </header>
-
+    
     <main class="container">
-        <h1 class="section-title">Prestasi Terbaru Siswa Kami</h1>
-
-        <div class="prestasi-list">
-            <div class="prestasi-card">
-                <div class="prestasi-card-body">
-                    <h3 style="color: var(--color-secondary);"><i class="fas fa-trophy"></i> Juara 1 FLS2N</h3>
-                    <p>Meraih Juara 1 Lomba Menyanyi dalam ajang FLS2N Tingkat Kabupaten Kediri pada tahun 2023.</p>
-                </div>
-            </div>
-            <div class="prestasi-card">
-                <div class="prestasi-card-body">
-                    <h3 style="color: var(--color-secondary);"><i class="fas fa-medal"></i> Juara 2 Pencak Silat</h3>
-                    <p>Prestasi membanggakan Juara 2 pada kejuaraan Pencak Silat Dandim Kediri yang diadakan pada tahun 2022.</p>
-                </div>
-            </div>
-            <div class="prestasi-card">
-                <div class="prestasi-card-body">
-                    <h3 style="color: var(--color-secondary);"><i class="fas fa-star"></i> Best Performance</h3>
-                    <p>Meraih Juara 3 'Best Performance Karnival Heritage Culture Pare' tahun 2023, menunjukkan keunggulan di bidang seni dan budaya.</p>
-                </div>
-            </div>
-        </div>
-
-        <h1 class="section-title">Galeri Ekstrakurikuler dan Kegiatan</h1>
-        <div class="prestasi-list" style="margin-bottom: 50px;">
-            <div class="prestasi-card">
-                <img src="https://files.catbox.moe/znf6tw.jpeg" alt="Kegiatan Ekstrakurikuler Pramuka" style="height: 200px; width: 100%; object-fit: cover;">
-                <div class="prestasi-card-body">
-                    <h3 style="color: var(--color-primary);">Ekstrakurikuler Pramuka</h3>
-                    <p>Latihan rutin wajib Pramuka, menanamkan jiwa kepemimpinan dan disiplin yang kuat.</p>
-                </div>
-            </div>
-            <div class="prestasi-card">
-                <img src="https://files.catbox.moe/0xnqrk.jpeg" alt="Kegiatan Ekstrakurikuler PMR" style="height: 200px; width: 100%; object-fit: cover;">
-                <div class="prestasi-card-body">
-                    <h3 style="color: var(--color-primary);">Palang Merah Remaja (PMR)</h3>
-                    <p>Aksi sosial dan pelatihan pertolongan pertama, wujud kepedulian terhadap sesama dan lingkungan.</p>
-                </div>
-            </div>
-            <div class="prestasi-card">
-                <img src="https://files.catbox.moe/edus6n.jpeg" alt="Kegiatan Sosial Sekolah" style="height: 200px; width: 100%; object-fit: cover; background-color: #ddd;">
-                <div class="prestasi-card-body">
-                    <h3 style="color: var(--color-primary);">Bangga Menjadi Siswa</h3>
-                    <p>Bangga menjadi siswa SMPN 4 Pare.</p>
-                </div>
-            </div>
+        <h1 class="section-title">Berita, Kegiatan & Galeri Sekolah</h1>
+        <p style="text-align: center; margin-bottom: 50px;">Temukan kabar terbaru, kegiatan siswa, dan momen terbaik di SMPN 4 Pare.</p>
+        
+        <div style="min-height: 400px; display: flex; justify-content: center; align-items: center; border: 1px solid #eee; border-radius: 8px;">
+            <p style="font-style: italic; color: #999;">(Konten Berita, Kegiatan, dan Galeri Akan Ditampilkan di Sini)</p>
         </div>
     </main>
     
     <footer class="footer">
         <div class="container footer-content">
             <div class="footer-section">
-                <h4>SMPN 4 Pare</h4>
-                <p>Berakhlak Mulia dan Berprestasi</p>
-                <p>NPSN: 20511931</p>
-            </div>
-            <div class="footer-section">
                 <h4>Quick Links</h4>
                 <a href="tentang_kami.html">Visi & Misi</a>
-                <a href="ppdb.html">Pendaftaran Siswa Baru</a>
+                <a href="https://wa.me/6285655662935?text=Assalamualaikum.%20Saya%20ingin%20bertanya%20tentang%20pendaftaran%20siswa%20baru%20di%20SMPN%204%20Pare." target="_blank">Pendaftaran Siswa Baru</a>
                 <a href="berita_acara.html">Prestasi & Galeri</a>
             </div>
             <div class="footer-section">
                 <h4>Hubungi Kami</h4>
-                <p><i class="fas fa-map-marker-alt"></i> Jl. Merbabu, Pare, Kediri</p>
-                <p><i class="fas fa-phone"></i> (0354) 39108</p>
-                <p><i class="fas fa-envelope"></i> stafsmp4pare@gmail.com</p>
+                <p><i class="fas fa-map-marker-alt"></i> <strong>Jl. Merbabu, Pare, Kediri</strong></p>
+                <p><i class="fas fa-phone"></i> <strong>(0354) 39108</strong></p>
+                <p><i class="fas fa-envelope"></i> <strong>stafsmp4pare@gmail.com</strong></p>
             </div>
         </div>
     </footer>
