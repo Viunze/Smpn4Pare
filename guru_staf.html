@@ -6,32 +6,6 @@
     <title>Guru & Staf | SMPN 4 Pare</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-    <style>
-        /* Gaya tambahan atau override jika diperlukan */
-        .full-width-image {
-            width: 100%;
-            max-height: 550px; /* Batasi tinggi agar tidak terlalu besar */
-            object-fit: contain; /* Menggunakan 'contain' agar gambar tidak terpotong dan tetap proporsional */
-            border-radius: 10px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            margin-bottom: 40px;
-            background-color: #fff; /* Latar belakang putih jika gambar memiliki area transparan */
-            padding: 10px; /* Sedikit padding agar gambar tidak terlalu mepet border */
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .full-width-image {
-                max-height: 400px;
-            }
-        }
-        @media (max-width: 480px) {
-            .full-width-image {
-                max-height: 300px;
-            }
-        }
-
-    </style>
 </head>
 <body>
     <header class="header">
@@ -49,7 +23,7 @@
     </header>
 
     <main class="container">
-        <h1 class="section-title">Kepala Sekolah dan Jajaran Tenaga Pendidik & Kependidikan</h1>
+        <h1 class="section-title">Kepala Sekolah dan Jajaran Guru</h1>
         
         <div style="text-align: center; margin-bottom: 50px;">
             <div style="width: 300px; margin: 0 auto; background-color: var(--color-primary); color: var(--color-white); padding: 20px; border-radius: 10px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);">
@@ -61,11 +35,44 @@
         </div>
 
         <section style="text-align: center; margin-bottom: 50px;">
-            <h2 class="section-title" style="margin-top: 0; font-size: 2rem;">Keluarga Besar Guru dan Staf SMPN 4 Pare Tahun 2024</h2>
-            <img src="https://files.catbox.moe/6b32pr.jpg" alt="Foto Bersama Bapak Ibu Guru dan Staf Tahun 2024" class="full-width-image">
-            <p style="font-size: 1.1em; margin-top: 20px; color: var(--color-text);">Kami memiliki total 30 rombongan belajar yang didukung oleh tenaga pendidik dan kependidikan yang berdedikasi tinggi, tersertifikasi, dan profesional.</p>
+            <h2 class="section-title" style="margin-top: 0; font-size: 2rem;">Keluarga Besar Tenaga Pendidik</h2>
+            <img src="https://files.catbox.moe/aeo4h1.jpg" alt="Foto Bersama Bapak Ibu Guru" style="width: 100%; max-height: 400px; object-fit: cover; border-radius: 10px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);">
         </section>
+
+        <h2 class="section-title" style="font-size: 2rem;">Daftar Tenaga Pendidik dan Kependidikan</h2>
+        <div class="guru-grid">
+            <div class="guru-card">
+                <img src="assets/images/guru_contoh1.jpg" alt="Guru Budi" style="background-color: #ddd;">
+                <div class="guru-info">
+                    <h4>Budi Santoso, S.Pd.</h4>
+                    <p>Guru Mata Pelajaran Matematika</p>
+                </div>
+            </div>
+            <div class="guru-card">
+                <img src="assets/images/guru_contoh2.jpg" alt="Guru Ani" style="background-color: #ddd;">
+                <div class="guru-info">
+                    <h4>Ani Fitriani, M.Kom.</h4>
+                    <p>Guru Mata Pelajaran TIK</p>
+                </div>
+            </div>
+            <div class="guru-card">
+                <img src="assets/images/guru_contoh3.jpg" alt="Guru Dewi" style="background-color: #ddd;">
+                <div class="guru-info">
+                    <h4>Dewi Lestari, S.Hum.</h4>
+                    <p>Guru Mata Pelajaran Bahasa Inggris</p>
+                </div>
+            </div>
+            <div class="guru-card">
+                <img src="assets/images/guru_contoh4.jpg" alt="Guru Rahmat" style="background-color: #ddd;">
+                <div class="guru-info">
+                    <h4>Rahmat Hidayat</h4>
+                    <p>Staf Tata Usaha</p>
+                </div>
+            </div>
+        </div>
         
+        <p style="text-align: center; padding-bottom: 40px;">Kami memiliki total 30 rombongan belajar yang didukung oleh tenaga pendidik yang tersertifikasi dan profesional.</p>
+
     </main>
     
     <footer class="footer">
