@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berita & Prestasi | SMPN 4 Pare</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        .prestasi-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding-bottom: 50px;
+        }
+        .prestasi-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+        .prestasi-card:hover {
+            transform: translateY(-5px);
+        }
+        .prestasi-card-body {
+            padding: 20px;
+        }
+        .prestasi-card-body h3 {
+            color: var(--color-primary);
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="navbar">
+            <div class="logo"><a href="index.html">SMPN 4 Pare</a></div>
+            <nav class="nav-links">
+                <a href="index.html">Beranda</a>
+                <a href="tentang_kami.html">Profil Sekolah</a>
+                <a href="guru_staf.html">Guru & Staf</a>
+                <a href="berita_acara.html">Berita & Galeri</a>
+                <a href="ppdb.html">PPDB</a>
+                <a href="kontak.html">Kontak</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1 class="section-title">Prestasi Terbaru Siswa Kami</h1>
+
+        <div class="prestasi-list">
+            <div class="prestasi-card">
+                <div class="prestasi-card-body">
+                    <h3 style="color: var(--color-secondary);"><i class="fas fa-trophy"></i> Juara 1 FLS2N</h3>
+                    <p>Meraih Juara 1 Lomba Menyanyi dalam ajang FLS2N Tingkat Kabupaten Kediri pada tahun 2023.</p>
+                </div>
+            </div>
+            <div class="prestasi-card">
+                <div class="prestasi-card-body">
+                    <h3 style="color: var(--color-secondary);"><i class="fas fa-medal"></i> Juara 2 Pencak Silat</h3>
+                    <p>Prestasi membanggakan Juara 2 pada kejuaraan Pencak Silat Dandim Kediri yang diadakan pada tahun 2022.</p>
+                </div>
+            </div>
+            <div class="prestasi-card">
+                <div class="prestasi-card-body">
+                    <h3 style="color: var(--color-secondary);"><i class="fas fa-star"></i> Best Performance</h3>
+                    <p>Meraih Juara 3 'Best Performance Karnival Heritage Culture Pare' tahun 2023, menunjukkan keunggulan di bidang seni dan budaya.</p>
+                </div>
+            </div>
+        </div>
+
+        <h1 class="section-title">Galeri Kegiatan Sekolah</h1>
+        <div class="prestasi-list" style="margin-bottom: 50px;">
+            <div class="prestasi-card">
+                <img src="assets/images/galeri_takjil.jpg" alt="Kegiatan Pembagian Takjil" style="height: 200px; width: 100%; object-fit: cover;">
+                <div class="prestasi-card-body">
+                    <h3 style="color: var(--color-primary);">Kegiatan Sosial Ramadhan</h3>
+                    <p>Pembagian takjil oleh siswa dan guru pada bulan Maret 2025 sebagai wujud kepedulian sosial.</p>
+                </div>
+            </div>
+            <div class="prestasi-card">
+                <img src="assets/images/galeri_paskibra.jpg" alt="Kegiatan Paskibra" style="height: 200px; width: 100%; object-fit: cover;">
+                <div class="prestasi-card-body">
+                    <h3 style="color: var(--color-primary);">Latihan Rutin Ekstrakurikuler</h3>
+                    <p>Dokumentasi kegiatan ekstrakurikuler yang aktif dan beragam, membentuk fisik dan mental siswa.</p>
+                </div>
+            </div>
+            <div class="prestasi-card">
+                <img src="assets/images/galeri_tari.jpg" alt="Kegiatan Seni Tari" style="height: 200px; width: 100%; object-fit: cover;">
+                <div class="prestasi-card-body">
+                    <h3 style="color: var(--color-primary);">Karnival Budaya Sekolah</h3>
+                    <p>Aksi seni tari dalam acara tahunan, melestarikan budaya lokal dan menampilkan bakat siswa.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer">
+        <div class="container footer-content">
+            <div class="footer-section">
+                <h4>SMPN 4 Pare</h4>
+                <p>Berakhlak Mulia dan Berprestasi</p>
+                <p>NPSN: 20511931</p>
+            </div>
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <a href="tentang_kami.html">Visi & Misi</a>
+                <a href="ppdb.html">Pendaftaran Siswa Baru</a>
+                <a href="berita_acara.html">Prestasi & Galeri</a>
+            </div>
+            <div class="footer-section">
+                <h4>Hubungi Kami</h4>
+                <p><i class="fas fa-map-marker-alt"></i> Jl. Merbabu, Pare, Kediri</p>
+                <p><i class="fas fa-phone"></i> (0354) 39108</p>
+                <p><i class="fas fa-envelope"></i> stafsmp4pare@gmail.com</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
