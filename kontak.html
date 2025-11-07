@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <style>
-        /* CSS Khusus Kontak (Sudah dicopy ke style.css, tapi biarkan di sini jika Anda menggunakan terpisah) */
+        /* CSS Khusus Kontak */
         .contact-grid {
             display: flex;
             gap: 40px;
@@ -23,21 +23,25 @@
             border-bottom: 2px solid var(--color-secondary);
             padding-bottom: 10px;
         }
+        /* Style baru untuk menampung tombol WhatsApp agar rapi */
+        .wa-button-group {
+            display: flex;
+            gap: 10px; /* Jarak antar tombol */
+            flex-wrap: wrap; /* Pastikan tombol turun baris di mobile */
+        }
+        .wa-button-group a {
+            flex: 1; /* Agar tombol memiliki lebar yang sama */
+            min-width: 150px; /* Batasi lebar minimum */
+            text-align: center;
+        }
+
         .contact-form label {
             display: block;
             margin-bottom: 5px;
             font-weight: 600;
         }
-        .contact-form input, .contact-form textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .contact-form textarea {
-            resize: vertical;
-        }
+        /* ... (Kode CSS lainnya di sini tetap sama) ... */
+
         .map-embed {
             width: 100%;
             height: 400px;
@@ -91,13 +95,15 @@
             <div class="contact-form">
                 <h3>Kirim Pesan Melalui WhatsApp</h3>
                 <p style="margin-bottom: 20px;">Untuk respon cepat, kami sarankan Anda menghubungi tim kami melalui WhatsApp.</p>
-
-                <a href="https://wa.me/6285755290872?text=Assalamualaikum.%20Saya%20memiliki%20pertanyaan%20umum%20tentang%20sekolah." target="_blank" class="btn-primary" style="width: 100%; background-color: #25D366; color: white; margin-bottom: 15px;">
-                    <i class="fab fa-whatsapp"></i> Chat Admin (Umum)
-                </a>
-                <a href="https://wa.me/6285655662935?text=Assalamualaikum.%20Saya%20ingin%20bertanya%20mengenai%20Pendaftaran%20Siswa%20Baru." target="_blank" class="btn-primary" style="width: 100%; background-color: #075E54; color: white;">
-                    <i class="fab fa-whatsapp"></i> Chat Admin Center (PPDB)
-                </a>
+                
+                <div class="wa-button-group">
+                    <a href="https://wa.me/6285755290872?text=Assalamualaikum.%20Saya%20memiliki%20pertanyaan%20umum%20tentang%20sekolah." target="_blank" class="btn-primary" style="background-color: #25D366; color: white;">
+                        <i class="fab fa-whatsapp"></i> Chat Admin (Umum)
+                    </a>
+                    <a href="https://wa.me/6285655662935?text=Assalamualaikum.%20Saya%20ingin%20bertanya%20mengenai%20Pendaftaran%20Siswa%20Baru." target="_blank" class="btn-primary" style="background-color: #075E54; color: white;">
+                        <i class="fab fa-whatsapp"></i> Chat Admin Center (PPDB)
+                    </a>
+                </div>
                 
                 <p style="margin-top: 30px; font-style: italic; font-size: 0.9em;">(Kami telah mengganti formulir kontak dengan link WhatsApp agar Anda mendapatkan respons yang lebih cepat dan langsung.)</p>
             </div>
@@ -106,6 +112,11 @@
     
     <footer class="footer">
         <div class="container footer-content">
+            <div class="footer-section">
+                <h4>SMPN 4 Pare</h4>
+                <p>Berakhlak Mulia dan Berprestasi</p>
+                <p>NPSN: 20511931</p>
+            </div>
             <div class="footer-section">
                 <h4>Quick Links</h4>
                 <a href="tentang_kami.html">Visi & Misi</a>
