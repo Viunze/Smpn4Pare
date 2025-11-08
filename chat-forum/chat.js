@@ -1,285 +1,149 @@
 // chat-forum/chat.js
-// Logika Chat Real-Time Forum SMPN 4 Pare
+// Logika otentikasi, koneksi Socket.IO, dan penanganan pesan untuk Chat Forum.
 
-// *** GANTI DENGAN DOMAIN RAILWAY PRODUKSI ANDA ***
+// KRITIS: Pastikan URL ini menunjuk ke Railway Backend Anda
 const SERVER_URL = 'https://smpn4pare-production.up.railway.app'; 
-const socket = io(SERVER_URL); // Inisiasi koneksi Socket.IO
 
-// --- DOM Elements ---
-const chatMessages = document.getElementById('chat-messages');
-const messageInput = document.getElementById('message-input');
-const sendButton = document.getElementById('send-button');
-const userListContainer = document.getElementById('user-list');
+let socket;
+let currentUser;
+let currentKelas;
+let token;
 
-// --- Global State ---
-const token = localStorage.getItem('token');
-let currentUser = JSON.parse(localStorage.getItem('user'));
-let allUsers = []; 
-let replyToMessage = null; 
+// =================================================================
+// 1. FUNGSI OTENTIKASI & PENGALIHAN
+// =================================================================
 
-// ==========================================================
-// 🛑 CEK AUTENTIKASI AWAL (PENTING UNTUK MENCEGAH LOOPING)
-// ==========================================================
-if (!token || !currentUser) {
-    // Jika tidak ada token (belum login), arahkan ke halaman login
-    console.warn('User belum terautentikasi. Mengarahkan ke halaman login.');
-    window.location.href = 'index.html'; 
-    
-    // 🔥 PENTING: TAMBAHKAN 'return' UNTUK MENGHENTIKAN EKSEKUSI SCRIPT INI
-    // Jika script tidak dihentikan, ia dapat memicu event lain yang menyebabkan loop.
-    return; 
-}
+function checkAuthAndInitialize() {
+    // Ambil token dan data pengguna dari Local Storage
+    token = localStorage.getItem('token');
+    const userJson = localStorage.getItem('user');
 
-// ----------------------------------------------------------
-// --- UTILITY FUNCTIONS ---
-// ----------------------------------------------------------
+    if (!token || !userJson) {
+        // Jika tidak ada token, alihkan ke halaman login/register
+        window.location.href = 'index.html';
+        return; // Mengakhiri eksekusi di sini
+    }
 
-// 1. Ambil Semua User (untuk Tagging & User List)
-const fetchUsers = async () => {
     try {
-        const response = await fetch(`${SERVER_URL}/api/auth/users`, {
-            headers: { 'x-auth-token': token } 
-        });
+        currentUser = JSON.parse(userJson);
+        currentKelas = currentUser.kelas;
         
-        if (!response.ok) {
-            // Jika token kadaluarsa atau API error, log out dan redirect
-            if (response.status === 401) {
-                localStorage.clear();
-                window.location.href = 'index.html';
-                return; // Hentikan eksekusi
-            }
-            throw new Error('Gagal mengambil daftar pengguna');
-        }
-
-        const data = await response.json();
-        allUsers = data.users; 
-        renderUserList();
-    } catch (error) {
-        console.error('Gagal mengambil daftar pengguna:', error);
+        // Inisialisasi tampilan chat dan koneksi
+        initializeChatApp();
+    } catch (e) {
+        // Jika data user rusak, hapus dan alihkan
+        console.error("Data pengguna rusak, mengalihkan ke login.", e);
+        localStorage.clear();
+        window.location.href = 'index.html';
     }
 }
 
-// 2. Render Daftar Pengguna di Sidebar
-const renderUserList = () => {
-    userListContainer.innerHTML = '';
-    allUsers.forEach(user => {
-        const item = document.createElement('div');
-        item.className = 'user-list-item';
-        const isMe = user.id === currentUser.id;
-        item.innerHTML = `${user.nama_lengkap} <span class="user-class">(${user.kelas})</span> ${isMe ? '(Anda)' : ''}`;
-        userListContainer.appendChild(item);
+function initializeChatApp() {
+    // Tampilkan nama pengguna dan kelas di header chat
+    document.getElementById('user-info').textContent = 
+        `${currentUser.nama_lengkap} (${currentKelas})`;
+
+    // Hubungkan ke Socket.IO
+    socket = io(SERVER_URL, {
+        query: { token: token } // Mengirim token untuk otentikasi Socket.IO
     });
+
+    // Event handler Socket.IO
+    setupSocketListeners();
+
+    // Event handler formulir kirim pesan
+    document.getElementById('send-form').addEventListener('submit', handleSendMessage);
 }
 
-// 3. Fungsi utama untuk menampilkan pesan ke UI
-const displayMessage = (msg) => {
-    const isSent = msg.sender.id === currentUser.id;
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${isSent ? 'message-sent' : 'message-received'}`;
-    messageDiv.setAttribute('data-message-id', msg.id);
 
-    // --- REPLY BOX ---
-    if (msg.reply_to_content) {
-        const replyBox = document.createElement('div');
-        replyBox.className = 'reply-box';
-        replyBox.innerHTML = `<p style="font-size: 0.8em; color: #555;">
-            **Membalas ${msg.reply_to_sender}:** ${msg.reply_to_content.substring(0, 50)}...
-        </p>`;
-        messageDiv.appendChild(replyBox);
-    }
-    
-    // --- SENDER INFO (Nama dan Kelas) ---
-    const senderInfo = document.createElement('span');
-    senderInfo.className = 'message-sender';
-    senderInfo.innerHTML = `${msg.sender.name} (${msg.sender.kelas})`;
-    if (!isSent) {
-         senderInfo.style.color = '#075E54';
-    }
-    messageDiv.appendChild(senderInfo);
+// =================================================================
+// 2. LOGIKA SOCKET.IO LISTENERS
+// =================================================================
 
-    // --- CONTENT (Parsing @mentions) ---
-    const contentP = document.createElement('p');
-    let contentHtml = msg.content;
-    
-    // Parsing untuk tag (@nama)
-    const styledContent = contentHtml.replace(/@(\w+\s?\w*)/g, (match) => {
-        const nameToFind = match.substring(1).trim();
-        const mentionedUser = allUsers.find(u => u.nama_lengkap.toLowerCase() === nameToFind.toLowerCase());
-        
-        if(mentionedUser) {
-            return `<span style="color: #1E90FF; font-weight: 600;">${match}</span>`;
-        }
-        return match; 
+function setupSocketListeners() {
+    socket.on('connect', () => {
+        console.log('Terkoneksi ke server chat:', socket.id);
+        // Bergabung ke ruangan sesuai kelas
+        socket.emit('joinRoom', currentKelas);
     });
 
-    contentP.innerHTML = styledContent;
-    messageDiv.appendChild(contentP);
-
-    // --- TIMESTAMP ---
-    const timestampSpan = document.createElement('span');
-    timestampSpan.className = 'message-timestamp';
-    timestampSpan.textContent = new Date(msg.timestamp).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-    messageDiv.appendChild(timestampSpan);
-    
-    chatMessages.appendChild(messageDiv);
-    chatMessages.scrollTop = chatMessages.scrollHeight; 
-
-    // --- Event Listener untuk Reply (klik kanan) ---
-    messageDiv.addEventListener('contextmenu', (e) => {
-        e.preventDefault(); 
-        setReplyMode(msg);
+    socket.on('disconnect', () => {
+        console.log('Terputus dari server.');
     });
-};
 
-// 4. Logika Mengatur Mode Reply
-const setReplyMode = (msg) => {
-    replyToMessage = msg;
-    messageInput.placeholder = `Membalas ${msg.sender.name} (${msg.sender.kelas}). Tekan ESC untuk batalkan.`;
-    messageInput.focus();
-    messageInput.classList.add('reply-mode');
-};
+    socket.on('connect_error', (err) => {
+        console.error('Kesalahan koneksi Socket.IO:', err.message);
+        displaySystemMessage('Gagal terhubung ke chat. Server mungkin sedang offline.');
+    });
 
-// 5. Logika Membatalkan Mode Reply
-const cancelReplyMode = () => {
-    replyToMessage = null;
-    messageInput.placeholder = 'Ketik pesan Anda di sini...';
-    messageInput.classList.remove('reply-mode');
-    hideMentionSuggestions();
-};
+    socket.on('receiveMessage', handleReceiveMessage);
+}
 
+// =================================================================
+// 3. LOGIKA PENANGANAN PESAN
+// =================================================================
 
-// ----------------------------------------------------------
-// --- LOGIKA TAGGING (Saran Pengguna) ---
-// ----------------------------------------------------------
+function handleSendMessage(e) {
+    e.preventDefault();
+    const input = document.getElementById('message-input');
+    const content = input.value.trim();
 
-const mentionSuggestions = document.createElement('div'); 
-mentionSuggestions.id = 'mention-suggestions';
-// Pastikan elemen ini ditambahkan ke BODY atau elemen root Anda
-document.body.appendChild(mentionSuggestions);
+    if (content) {
+        const msgData = {
+            senderId: currentUser._id,
+            content: content,
+            kelas: currentKelas,
+            // replyToId, mentions, dll. (Tambahkan jika diperlukan)
+        };
 
-const showMentionSuggestions = (query) => {
-    mentionSuggestions.innerHTML = '';
-    if (!query) {
-        mentionSuggestions.style.display = 'none';
-        return;
+        // Kirim pesan ke server
+        socket.emit('sendMessage', msgData);
+        input.value = '';
     }
+}
 
-    const filteredUsers = allUsers.filter(user => 
-        user.nama_lengkap.toLowerCase().includes(query.toLowerCase())
-    ).slice(0, 5); 
-
-    if (filteredUsers.length > 0) {
-        const inputRect = messageInput.getBoundingClientRect();
-        // Posisi saran yang disederhanakan
-        mentionSuggestions.style.cssText = `
-            position: absolute;
-            bottom: 60px; /* Di atas input field */
-            left: ${inputRect.left}px;
-            width: ${inputRect.width}px;
-        `;
-        
-        filteredUsers.forEach(user => {
-            const item = document.createElement('div');
-            item.className = 'mention-item';
-            item.textContent = `@${user.nama_lengkap} (${user.kelas})`;
-            
-            item.onclick = () => {
-                const currentVal = messageInput.value;
-                const lastAtIndex = currentVal.lastIndexOf('@');
-                const newVal = currentVal.substring(0, lastAtIndex) + `@${user.nama_lengkap} `;
-                messageInput.value = newVal;
-                hideMentionSuggestions();
-                messageInput.focus();
-            };
-            mentionSuggestions.appendChild(item);
-        });
-        mentionSuggestions.style.display = 'block';
+function handleReceiveMessage(msg) {
+    const chatBox = document.getElementById('chat-messages');
+    
+    // Asumsi msg memiliki struktur yang diharapkan dari backend (nama, konten, timestamp)
+    const msgElement = document.createElement('div');
+    msgElement.className = 'chat-message';
+    
+    // Tentukan apakah pesan ini milik pengguna saat ini
+    const isCurrentUser = msg.sender.id === currentUser._id;
+    if (isCurrentUser) {
+        msgElement.classList.add('self-message');
     } else {
-        hideMentionSuggestions();
-    }
-};
-
-const hideMentionSuggestions = () => {
-    mentionSuggestions.style.display = 'none';
-};
-
-
-// ----------------------------------------------------------
-// --- CHAT INITIATION & SOCKET.IO ---
-// ----------------------------------------------------------
-
-// Fetch user list saat berhasil masuk ke halaman chat
-fetchUsers(); 
-
-// Listener Socket.io
-socket.on('receiveMessage', (msg) => {
-    displayMessage(msg);
-});
-
-// Logika Kirim Pesan
-const sendMessage = () => {
-    const content = messageInput.value.trim();
-    if (content === '') return;
-
-    let mentions = [];
-    // Regex untuk menemukan @nama, termasuk nama dengan spasi (seperti @Adi Wijaya)
-    const mentionMatches = content.match(/@(\w+\s?\w*)/g); 
-    
-    if (mentionMatches) {
-        mentionMatches.forEach(match => {
-            const nameToFind = match.substring(1).trim(); 
-            const mentionedUser = allUsers.find(u => u.nama_lengkap.toLowerCase() === nameToFind.toLowerCase());
-            if (mentionedUser) {
-                mentions.push(mentionedUser._id);
-            }
-        });
+        msgElement.classList.add('other-message');
     }
 
-    const messageData = {
-        senderId: currentUser.id,
-        content: content,
-        kelas: currentUser.kelas,
-        replyToId: replyToMessage ? replyToMessage.id : null,
-        mentions: mentions, 
-    };
+    // Tampilkan detail pesan
+    msgElement.innerHTML = `
+        <div class="message-header">
+            <span class="sender-name">${msg.sender.name} (${msg.sender.kelas})</span>
+            <span class="timestamp">${new Date(msg.timestamp).toLocaleTimeString()}</span>
+        </div>
+        <div class="message-content">${msg.content}</div>
+    `;
 
-    socket.emit('sendMessage', messageData);
-    
-    messageInput.value = ''; 
-    cancelReplyMode(); 
-};
-
-// ----------------------------------------------------------
-// --- EVENT LISTENERS ---
-// ----------------------------------------------------------
-
-if (sendButton) sendButton.addEventListener('click', sendMessage);
-if (messageInput) {
-    // Kirim pesan dengan Enter, batalkan reply dengan Escape
-    messageInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            sendMessage();
-            e.preventDefault();
-        } else if (e.key === 'Escape') {
-            cancelReplyMode();
-        }
-    });
-
-    // Logika menampilkan saran mention saat mengetik '@'
-    messageInput.addEventListener('input', (e) => {
-        const currentVal = e.target.value;
-        const lastAtIndex = currentVal.lastIndexOf('@');
-        
-        if (lastAtIndex !== -1) {
-            const query = currentVal.substring(lastAtIndex + 1);
-            // Hanya tampilkan saran jika setelah '@' belum ada spasi
-            if (!query.includes(' ')) {
-                 showMentionSuggestions(query);
-            } else {
-                hideMentionSuggestions();
-            }
-        } else {
-            hideMentionSuggestions();
-        }
-    });
+    chatBox.appendChild(msgElement);
+    // Gulir ke bawah agar pesan terbaru terlihat
+    chatBox.scrollTop = chatBox.scrollHeight;
 }
+
+function displaySystemMessage(message) {
+    const chatBox = document.getElementById('chat-messages');
+    const msgElement = document.createElement('div');
+    msgElement.className = 'system-message';
+    msgElement.textContent = message;
+    chatBox.appendChild(msgElement);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+
+// =================================================================
+// 4. INVOCATION (PANGGILAN UTAMA)
+// =================================================================
+
+// Panggil fungsi otentikasi saat script dimuat
+checkAuthAndInitialize();
