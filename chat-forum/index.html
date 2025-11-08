@@ -1,268 +1,76 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login / Registrasi - Chat Forum SMPN 4 Pare</title>
-    <link rel="stylesheet" href="../style.css"> 
-    <style>
-        /* CSS Khusus untuk Halaman Login/Reg */
-        .auth-container {
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            display: flex;
-            gap: 40px;
-            background-color: #f9f9f9;
-        }
-        .auth-box {
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            background: white;
-        }
-        .auth-box h3 {
-            margin-top: 0;
-            color: #1E8449; /* Warna hijau SMPN 4 */
-            border-bottom: 2px solid #D4AC0D;
-            padding-bottom: 10px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s;
-        }
-        #register-btn {
-            background-color: #1E8449;
-            color: white;
-        }
-        #register-btn:hover {
-            background-color: #156535;
-        }
-        #login-btn {
-            background-color: #D4AC0D;
-            color: black;
-        }
-        #login-btn:hover {
-            background-color: #b7950b;
-        }
-        .message-output {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 4px;
-            display: none;
-            font-weight: bold;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-    </style>
-</head>
-<body>
-    <header>
-        </header>
+<script>
+    // KRITIS: Pastikan URL ini menunjuk ke Railway
+    const SERVER_URL = 'https://smpn4pare-production.up.railway.app'; 
 
-    <div class="auth-container">
-        <div class="auth-box" id="register-box">
-            <h3>Registrasi Siswa Baru</h3>
-            <form id="register-form">
-                <div class="form-group">
-                    <label for="reg-nama">Nama Lengkap</label>
-                    <input type="text" id="reg-nama" required value="cello destian">
-                </div>
-                <div class="form-group">
-                    <label for="reg-username">Username (NISN/NIS)</label>
-                    <input type="text" id="reg-username" required value="21241244">
-                </div>
-                <div class="form-group">
-                    <label for="reg-password">Password</label>
-                    <input type="password" id="reg-password" required value="........">
-                </div>
-                <div class="form-group">
-                    <label for="reg-kelas">Kelas</label>
-                    <select id="reg-kelas" required>
-                        <option value="">Pilih Kelas</option>
-                        <option value="VII A">VII A</option>
-                        <option value="VIII F" selected>VIII F</option>
-                        <option value="IX J">IX J</option>
-                    </select>
-                </div>
-                <button type="submit" id="register-btn">Registrasi</button>
-            </form>
-            <div id="register-message" class="message-output"></div>
-        </div>
+    const displayStatus = (id, message, type) => {
+        // ... (Kode displayStatus Anda)
+    };
 
-        <div class="auth-box" id="login-box">
-            <h3>Login Chat Forum</h3>
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="login-username">Username (NISN/NIS)</label>
-                    <input type="text" id="login-username" required>
-                </div>
-                <div class="form-group">
-                    <label for="login-password">Password</label>
-                    <input type="password" id="login-password" required>
-                </div>
-                <button type="submit" id="login-btn">Login</button>
-            </form>
-            <div id="login-message" class="message-output"></div>
-        </div>
-    </div>
-    
-    <script src="chat.js"></script> 
-    <script>
-        // KRITIS: Pastikan URL ini menunjuk ke Railway
-        const SERVER_URL = 'https://smpn4pare-production.up.railway.app'; 
-
-        const displayStatus = (id, message, type) => {
-            const output = document.getElementById(id);
-            output.textContent = message;
-            output.className = `message-output ${type}`;
-            output.style.display = 'block';
+    // --- Handle Registrasi ---
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        // ... (Payload Anda)
+        const payload = {
+            nama_lengkap: document.getElementById('reg-nama').value,
+            username: document.getElementById('reg-username').value,
+            password: document.getElementById('reg-password').value,
+            kelas: document.getElementById('reg-kelas').value
         };
 
-        // --- Handle Registrasi ---
-        document.getElementById('register-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const payload = {
-                nama_lengkap: document.getElementById('reg-nama').value,
-                username: document.getElementById('reg-username').value,
-                password: document.getElementById('reg-password').value,
-                kelas: document.getElementById('reg-kelas').value
-            };
+        try {
+            const response = await fetch(`${SERVER_URL}/api/auth/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
 
-            try {
-                // KRITIS: Menggunakan SERVER_URL untuk memastikan request ke Railway
-                const response = await fetch(`${SERVER_URL}/api/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                // --- LOGIKA VALIDASI RESPONS DARI BACKEND ---
-                const contentType = response.headers.get('content-type');
-                let data;
-
-                if (response.ok && contentType && contentType.includes('application/json')) {
-                    data = await response.json();
-                } else {
-                    // Penanganan kegagalan (4xx, 5xx) atau respons non-JSON (HTML error page)
-                    
-                    // Coba baca sebagai teks untuk debugging
-                    const text = await response.text();
-                    console.error('Non-JSON Response/Error:', text.substring(0, 100));
-
-                    // Jika response.ok adalah false, server Railway seharusnya merespons 
-                    // dengan status 400 (Bad Request) atau 409 (Conflict), BUKAN HTML.
-                    
-                    if (response.status === 404) {
-                        // Jika 404, artinya endpoint /api/auth/register tidak ditemukan di Railway
-                        displayStatus('register-message', 'Gagal: Endpoint API tidak ditemukan di server Railway.', 'error');
-                        return;
-                    }
-                    
-                    // Coba parsing body sebagai JSON jika ada error (mungkin server kirim JSON error)
-                    try {
-                        data = JSON.parse(text); 
-                    } catch (e) {
-                        // Jika bukan JSON, beri pesan error generik
-                        data = { msg: `Registrasi gagal. Cek log server. (Status: ${response.status})` };
-                    }
+            // Logika validasi respons (sama seperti sebelumnya, memastikan respons bukan HTML error)
+            const contentType = response.headers.get('content-type');
+            let data = {};
+            // ... (Logika penanganan non-JSON)
+            if (contentType && contentType.includes('application/json')) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                // Jika server tidak OK, kita berasumsi ada pesan error di text/data
+                try {
+                    data = JSON.parse(text); 
+                } catch (e) {
+                    data.msg = `Registrasi gagal. Server merespons tidak terduga. (Status: ${response.status})`;
                 }
-                // --- AKHIR LOGIKA VALIDASI RESPONS ---
+            }
+            // ... (Akhir logika penanganan non-JSON)
 
-
-                if (response.ok) {
-                    // LOGIKA SUKSES
-                    displayStatus('register-message', 'Registrasi Berhasil! Silakan Login.', 'success');
+            if (response.ok) {
+                // KRITIS: Periksa apakah token dan user ada di respons backend
+                if (data.token && data.user) {
+                    displayStatus('register-message', 'Registrasi Berhasil! Mengalihkan ke forum.', 'success');
+                    
+                    // LINGKARAN MERAH SUDAH DIHENTIKAN DI SINI:
                     localStorage.setItem('token', data.token);
                     localStorage.setItem('user', JSON.stringify(data.user));
+                    
                     setTimeout(() => {
                         window.location.href = 'chat_forum.html'; 
                     }, 1500);
 
                 } else {
-                    // LOGIKA GAGAL (Response status 4xx/5xx)
-                    displayStatus('register-message', data.msg || 'Registrasi gagal. Username mungkin sudah terdaftar.', 'error');
+                    // Jika registrasi OK tapi token hilang, hentikan redirect.
+                    displayStatus('register-message', 'Registrasi OK, tapi data sesi hilang. Cek backend!', 'error');
+                    console.error('SERVER ERROR: Token atau user hilang di respons 200 OK.');
                 }
-
-            } catch (err) {
-                // Ini menangkap Error Jaringan (CORS, DNS, Server mati, atau SyntaxError JSON)
-                console.error('Final Error Catch:', err);
-                
-                // Jika error adalah SyntaxError, itu berarti responsnya HTML (404/BLOCKED)
-                if (err instanceof SyntaxError) {
-                    displayStatus('register-message', 'Terjadi kesalahan jaringan: Respons bukan JSON yang diharapkan. Cek CORS di Railway.', 'error');
-                } else {
-                    displayStatus('register-message', 'Terjadi kesalahan koneksi server.', 'error');
-                }
+            } else {
+                // LOGIKA GAGAL (Response status 4xx/5xx)
+                displayStatus('register-message', data.msg || 'Registrasi gagal. Username mungkin sudah terdaftar.', 'error');
             }
-        });
 
-        // --- Handle Login (Harusnya juga diperbaiki dengan validasi yang sama) ---
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const payload = {
-                username: document.getElementById('login-username').value,
-                password: document.getElementById('login-password').value,
-            };
+        } catch (err) {
+            // ... (Logika penanganan error jaringan/CORS)
+        }
+    });
 
-            try {
-                const response = await fetch(`${SERVER_URL}/api/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                // Sederhanakan penanganan JSON untuk Login (seharusnya menggunakan logika lengkap di atas juga)
-                const data = await response.json().catch(e => {
-                    console.error('JSON Parse Error di Login:', e);
-                    throw new Error('Respons server tidak valid.');
-                }); 
-
-                if (response.ok) {
-                    displayStatus('login-message', 'Login Berhasil! Mengarahkan ke forum...', 'success');
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    setTimeout(() => {
-                        window.location.href = 'chat_forum.html'; 
-                    }, 1500);
-
-                } else {
-                    displayStatus('login-message', data.msg || 'Username atau password salah.', 'error');
-                }
-            } catch (err) {
-                displayStatus('login-message', 'Terjadi kesalahan koneksi server.', 'error');
-                console.error('Error:', err);
-            }
-        });
-        
-    </script>
-</body>
-</html>
+    // --- Handle Login (Harusnya juga diperbaiki) ---
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+        // ... Logika login Anda di sini (Pastikan login juga menyimpan token/user)
+    });
+</script>
