@@ -139,10 +139,8 @@
     
     <script src="chat.js"></script> 
     <script>
-        // Logika Form di halaman login/register
         const SERVER_URL = 'https://smpn4pare-production.up.railway.app'; 
 
-        // Fungsi Tampilkan Pesan Status
         const displayStatus = (id, message, type) => {
             const output = document.getElementById(id);
             output.textContent = message;
@@ -220,10 +218,9 @@
             }
         });
 
-        // Cek jika sudah login, langsung redirect ke chat
-        if (localStorage.getItem('token')) {
-             window.location.href = 'chat_forum.html'; 
-        }
+        // HILANGKAN CEK TOKEN DI SINI AGAR TIDAK TERJADI FLICKER!
+        // Pengalihan hanya terjadi setelah tombol Login/Registrasi ditekan.
+        
     </script>
 </body>
 </html>
