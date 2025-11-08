@@ -6,7 +6,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
 
-// Impor model dan routes
+// Import model dan routes
 // Pastikan path ke file routes/auth dan models/Message benar
 const authRoutes = require('./routes/auth');
 const Message = require('./models/Message'); // Asumsi Anda memiliki model ini
@@ -24,10 +24,11 @@ const MONGO_URI = process.env.MONGO_URI;
 const ALLOWED_ORIGINS = [
     // Domain Production Vercel Anda
     'https://smpn4pare.vercel.app', 
-    // Domain Git Main Branch (Pastikan ini sesuai dengan yang Anda akses)
+    // Domain Git Main Branch
     'https://smpn4pare-git-main-viunzes-projects.vercel.app', 
-    // Domain Preview/Deploy ID (Pastikan ini sesuai dengan deploy ID Anda yang lain)
+    // Domain Preview/Deploy ID (Termasuk ID yang Anda akses sebelumnya)
     'https://smpn4pare-ihc0ea7uu-viunzes-projects.vercel.app', 
+    'https://smpn4pare-3qqgo7lbi-viunzes-projects.vercel.app', // Domain lama
     // Domain Railway itu sendiri
     'https://smpn4pare-production.up.railway.app',
     // Domain lokal untuk testing
@@ -47,7 +48,7 @@ app.use(express.json()); // Body parser untuk menerima JSON
 // 2. KONEKSI DATABASE
 // =================================================================
 mongoose.connect(MONGO_URI)
-    .then(() => console.log('MongoDB berhasil terhubung.')) // Log ini sudah terkonfirmasi berhasil di Railway
+    .then(() => console.log('MongoDB berhasil terhubung.'))
     .catch(err => {
         console.error('Koneksi MongoDB GAGAL:', err.message);
         process.exit(1);
@@ -62,8 +63,6 @@ app.use('/api/auth', authRoutes);
 // =================================================================
 // 4. SOCKET.IO Logic (Real-Time Chat)
 // =================================================================
-
-// Konfigurasi CORS untuk Socket.io
 const io = new Server(server, {
     cors: {
         origin: ALLOWED_ORIGINS,
@@ -75,16 +74,11 @@ const io = new Server(server, {
 io.on('connection', (socket) => {
     console.log(`User terhubung: ${socket.id}`);
 
-    // Logika pengiriman pesan (disingkat, gunakan kode lengkap Anda sebelumnya jika diperlukan)
+    // ... (Logika Socket.IO Anda)
     socket.on('sendMessage', async (data) => {
-        // Asumsi logika penyimpanan dan populasi pesan dari kode sebelumnya sudah ada di sini
         try {
-            // ... (Simpan pesan ke MongoDB)
-            // ... (Populasi data pengirim)
-            
-            // Kirim pesan ke semua klien
-            io.emit('receiveMessage', data); // Mengirim data mentah untuk tujuan testing
-            
+            // Logika penyimpanan dan populasi pesan Anda...
+            io.emit('receiveMessage', data); 
         } catch (error) {
             console.error('Gagal memproses pesan:', error);
         }
