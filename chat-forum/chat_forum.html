@@ -3,123 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Forum - SMPN 4 Pare</title>
-    <link rel="stylesheet" href="../style.css"> 
+    <title>Forum Chat Kelas</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+
     <style>
-        /* CSS Khusus untuk Chat Forum (Contoh Layout) */
+        /* Gaya Modern Mirip Aplikasi Chat */
+        :root {
+            --wa-green: #075E54;
+            --wa-light-green: #25D366;
+            --wa-bubble-self: #DCF8C6; /* Hijau Muda untuk pesan sendiri */
+            --wa-bubble-other: #FFFFFF; /* Putih untuk pesan orang lain */
+            --wa-background: #E5DDD5; /* Latar belakang chat */
+            --wa-text: #1F2D33;
+            --wa-secondary-text: #808080;
+        }
+
         body {
-            font-family: sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--wa-background);
             margin: 0;
             padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
         .chat-container {
-            max-width: 900px;
-            height: 80vh; 
-            margin: 50px auto;
-            border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            width: 95%;
+            max-width: 950px;
+            height: 90vh;
             display: flex;
             flex-direction: column;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            background-color: white;
+            background-color: var(--wa-bubble-other);
         }
+
+        /* Header Chat */
         .chat-header {
-            background-color: #1E8449; 
+            background-color: var(--wa-green);
             color: white;
             padding: 15px 20px;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #D4AC0D;
+            flex-direction: column;
+            justify-content: center;
         }
+
         .chat-header h2 {
             margin: 0;
-            font-size: 1.5em;
+            font-size: 1.2em;
         }
-        .user-info {
-            font-size: 0.9em;
-            opacity: 0.8;
+        
+        #user-info {
+            font-size: 0.85em;
+            opacity: 0.9;
         }
+
+        /* Area Pesan */
         #chat-messages {
             flex-grow: 1;
-            padding: 20px;
+            padding: 10px 20px;
             overflow-y: auto;
-            background-color: #fcfcfc;
-            border-bottom: 1px solid #eee;
-        }
-        .message-input-area {
-            padding: 15px 20px;
-            background-color: #f4f4f9;
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 5px;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="var(--wa-background)"/><circle cx="5" cy="5" r="0.5" fill="rgba(0,0,0,0.05)"/></svg>');
         }
+        
+        /* Box Pesan (General) */
+        .chat-message {
+            max-width: 65%;
+            padding: 8px 10px;
+            border-radius: 8px;
+            word-wrap: break-word;
+            position: relative;
+            box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+        }
+
+        /* Pesan dari Diri Sendiri */
+        .self-message {
+            background-color: var(--wa-bubble-self);
+            margin-left: auto;
+            align-self: flex-end;
+            border-top-right-radius: 0;
+        }
+        
+        /* Pesan dari Orang Lain */
+        .other-message {
+            background-color: var(--wa-bubble-other);
+            margin-right: auto;
+            align-self: flex-start;
+            border-top-left-radius: 0;
+        }
+
+        /* Header Pesan (Nama dan Kelas) */
+        .message-header {
+            font-size: 0.7em;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+        .sender-name {
+            color: #4CAF50; /* Warna Hijau Terang untuk Nama */
+        }
+        .timestamp {
+            font-size: 0.75em;
+            color: var(--wa-secondary-text);
+            margin-left: 10px;
+            float: right;
+            margin-top: 5px;
+        }
+
+        .message-content {
+            font-size: 0.95em;
+            color: var(--wa-text);
+            padding-right: 40px; /* Ruang untuk timestamp */
+        }
+
+        /* Area Input Pesan */
+        .message-input-area {
+            padding: 10px 15px;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+        }
+
         #message-input {
             flex-grow: 1;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 20px;
             font-size: 1em;
+            margin-right: 10px;
         }
+
         #send-btn {
-            background-color: #D4AC0D; 
-            color: black;
-            padding: 12px 20px;
-            border-radius: 20px;
+            background-color: var(--wa-green);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 50%; /* Tombol bulat */
             border: none;
-            font-weight: bold;
             cursor: pointer;
             transition: background-color 0.3s;
+            font-weight: 700;
         }
         #send-btn:hover {
-            background-color: #b7950b;
+            background-color: var(--wa-light-green);
         }
-        .chat-message {
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 10px;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-        .self-message {
-            background-color: #E6F7D4; 
-            align-self: flex-end;
-            margin-left: auto;
-            text-align: right;
-        }
-        .other-message {
-            background-color: #f0f0f0; 
-            align-self: flex-start;
-        }
-        .message-header {
-            font-size: 0.8em;
-            margin-bottom: 3px;
-        }
-        .sender-name {
-            font-weight: bold;
-            color: #1E8449;
-        }
-        .timestamp {
-            font-size: 0.75em;
-            color: #999;
-            margin-left: 10px;
-        }
+        
+        /* Sistem Pesan */
         .system-message {
             text-align: center;
             margin: 15px 0;
-            color: #888;
+            color: #999;
             font-style: italic;
             font-size: 0.9em;
         }
+
+        /* --------------------------------- */
+        /* Gaya Fitur Reply */
+        /* --------------------------------- */
+        .reply-context {
+            background-color: rgba(0, 0, 0, 0.05); /* Latar belakang abu-abu transparan */
+            border-left: 3px solid var(--wa-light-green);
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 3px;
+            font-size: 0.8em;
+            color: #444;
+            max-height: 40px;
+            overflow: hidden;
+        }
+
+        .reply-context strong {
+            color: var(--wa-green);
+        }
+
+        /* Area Reply di Input */
+        #reply-status {
+            background-color: #fcfcfc;
+            padding: 8px 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #reply-status span {
+            font-weight: 600;
+            color: #333;
+        }
+
+        #cancel-reply {
+            color: red;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* --------------------------------- */
+        /* Gaya Fitur Tagging/Mention */
+        /* --------------------------------- */
+        #mention-dropdown {
+            position: absolute;
+            bottom: 60px; /* Di atas input area */
+            width: 300px;
+            max-height: 200px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+            z-index: 500;
+            display: none; /* Default hidden */
+        }
+        
+        .mention-item {
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        
+        .mention-item:hover {
+            background-color: #f0f0f0;
+        }
+        
+        .highlight-mention {
+            font-weight: bold;
+            color: #007bff; /* Warna biru untuk mention */
+        }
     </style>
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     <div class="chat-container">
+        <div id="reply-status" style="display:none;">
+            <span>Membalas: <span id="reply-text-preview"></span></span>
+            <span id="cancel-reply">X</span>
+        </div>
+
         <div class="chat-header">
-            <h2>Chat Forum Kelas</h2>
+            <h2>Forum Kelas</h2>
             <div class="user-info" id="user-info">Memuat sesi...</div>
         </div>
 
@@ -131,6 +256,8 @@
             <input type="text" id="message-input" placeholder="Ketik pesan Anda..." required>
             <button type="submit" id="send-btn">Kirim</button>
         </form>
+        
+        <div id="mention-dropdown"></div>
     </div>
 
     <script src="chat.js"></script> 
