@@ -1,8 +1,9 @@
 // chat-forum/chat.js
-// Logika Chat Real-Time
+// Logika Chat Real-Time Forum SMPN 4 Pare
 
 // *** GANTI DENGAN DOMAIN RAILWAY PRODUKSI ANDA ***
 const SERVER_URL = 'https://smpn4pare-production.up.railway.app'; 
+const socket = io(SERVER_URL); // Inisiasi koneksi Socket.IO
 
 // --- DOM Elements ---
 const chatMessages = document.getElementById('chat-messages');
@@ -13,37 +14,44 @@ const userListContainer = document.getElementById('user-list');
 // --- Global State ---
 const token = localStorage.getItem('token');
 let currentUser = JSON.parse(localStorage.getItem('user'));
+let allUsers = []; 
+let replyToMessage = null; 
 
-// Cek autentikasi saat file ini dimuat
+// ==========================================================
+// 🛑 CEK AUTENTIKASI AWAL (PENTING UNTUK MENCEGAH LOOPING)
+// ==========================================================
 if (!token || !currentUser) {
     // Jika tidak ada token (belum login), arahkan ke halaman login
     console.warn('User belum terautentikasi. Mengarahkan ke halaman login.');
     window.location.href = 'index.html'; 
+    
+    // 🔥 PENTING: TAMBAHKAN 'return' UNTUK MENGHENTIKAN EKSEKUSI SCRIPT INI
+    // Jika script tidak dihentikan, ia dapat memicu event lain yang menyebabkan loop.
+    return; 
 }
 
-let allUsers = []; // Daftar semua pengguna dari backend
-let replyToMessage = null; // State pesan yang sedang dibalas
-
+// ----------------------------------------------------------
 // --- UTILITY FUNCTIONS ---
+// ----------------------------------------------------------
 
 // 1. Ambil Semua User (untuk Tagging & User List)
 const fetchUsers = async () => {
     try {
         const response = await fetch(`${SERVER_URL}/api/auth/users`, {
-            headers: { 'x-auth-token': token } // Menggunakan token untuk otorisasi
+            headers: { 'x-auth-token': token } 
         });
         
         if (!response.ok) {
-            // Jika token kadaluarsa, log out
+            // Jika token kadaluarsa atau API error, log out dan redirect
             if (response.status === 401) {
                 localStorage.clear();
                 window.location.href = 'index.html';
+                return; // Hentikan eksekusi
             }
             throw new Error('Gagal mengambil daftar pengguna');
         }
 
         const data = await response.json();
-        // Simpan data user lengkap (termasuk ID untuk mencocokkan mentions)
         allUsers = data.users; 
         renderUserList();
     } catch (error) {
@@ -62,7 +70,6 @@ const renderUserList = () => {
         userListContainer.appendChild(item);
     });
 }
-
 
 // 3. Fungsi utama untuk menampilkan pesan ke UI
 const displayMessage = (msg) => {
@@ -94,16 +101,15 @@ const displayMessage = (msg) => {
     const contentP = document.createElement('p');
     let contentHtml = msg.content;
     
-    // Ganti @NamaLengkap menjadi teks yang di-style
+    // Parsing untuk tag (@nama)
     const styledContent = contentHtml.replace(/@(\w+\s?\w*)/g, (match) => {
-        // Logika sederhana: cari user yang namanya match dengan tag
         const nameToFind = match.substring(1).trim();
         const mentionedUser = allUsers.find(u => u.nama_lengkap.toLowerCase() === nameToFind.toLowerCase());
         
         if(mentionedUser) {
             return `<span style="color: #1E90FF; font-weight: 600;">${match}</span>`;
         }
-        return match; // Jika tidak ada, biarkan seperti biasa
+        return match; 
     });
 
     contentP.innerHTML = styledContent;
@@ -141,9 +147,14 @@ const cancelReplyMode = () => {
     hideMentionSuggestions();
 };
 
+
+// ----------------------------------------------------------
 // --- LOGIKA TAGGING (Saran Pengguna) ---
+// ----------------------------------------------------------
+
 const mentionSuggestions = document.createElement('div'); 
 mentionSuggestions.id = 'mention-suggestions';
+// Pastikan elemen ini ditambahkan ke BODY atau elemen root Anda
 document.body.appendChild(mentionSuggestions);
 
 const showMentionSuggestions = (query) => {
@@ -159,12 +170,12 @@ const showMentionSuggestions = (query) => {
 
     if (filteredUsers.length > 0) {
         const inputRect = messageInput.getBoundingClientRect();
-        // Posisikan div saran
+        // Posisi saran yang disederhanakan
         mentionSuggestions.style.cssText = `
             position: absolute;
-            top: ${inputRect.top - 200}px; 
+            bottom: 60px; /* Di atas input field */
             left: ${inputRect.left}px;
-            /* Tambahkan styling lain dari CSS Anda */
+            width: ${inputRect.width}px;
         `;
         
         filteredUsers.forEach(user => {
@@ -175,7 +186,6 @@ const showMentionSuggestions = (query) => {
             item.onclick = () => {
                 const currentVal = messageInput.value;
                 const lastAtIndex = currentVal.lastIndexOf('@');
-                // Ganti @query dengan @NamaLengkap yang dipilih
                 const newVal = currentVal.substring(0, lastAtIndex) + `@${user.nama_lengkap} `;
                 messageInput.value = newVal;
                 hideMentionSuggestions();
@@ -194,9 +204,11 @@ const hideMentionSuggestions = () => {
 };
 
 
+// ----------------------------------------------------------
 // --- CHAT INITIATION & SOCKET.IO ---
+// ----------------------------------------------------------
 
-const socket = io(SERVER_URL); 
+// Fetch user list saat berhasil masuk ke halaman chat
 fetchUsers(); 
 
 // Listener Socket.io
@@ -209,9 +221,8 @@ const sendMessage = () => {
     const content = messageInput.value.trim();
     if (content === '') return;
 
-    // Logika untuk mengumpulkan ID Mentions
     let mentions = [];
-    // Mencari tag yang dimulai dengan @ diikuti Nama Lengkap (spasi opsional)
+    // Regex untuk menemukan @nama, termasuk nama dengan spasi (seperti @Adi Wijaya)
     const mentionMatches = content.match(/@(\w+\s?\w*)/g); 
     
     if (mentionMatches) {
@@ -238,9 +249,13 @@ const sendMessage = () => {
     cancelReplyMode(); 
 };
 
-// Event Listeners
+// ----------------------------------------------------------
+// --- EVENT LISTENERS ---
+// ----------------------------------------------------------
+
 if (sendButton) sendButton.addEventListener('click', sendMessage);
 if (messageInput) {
+    // Kirim pesan dengan Enter, batalkan reply dengan Escape
     messageInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             sendMessage();
@@ -250,13 +265,14 @@ if (messageInput) {
         }
     });
 
+    // Logika menampilkan saran mention saat mengetik '@'
     messageInput.addEventListener('input', (e) => {
         const currentVal = e.target.value;
         const lastAtIndex = currentVal.lastIndexOf('@');
         
         if (lastAtIndex !== -1) {
             const query = currentVal.substring(lastAtIndex + 1);
-            // Hanya tampilkan saran jika query tidak mengandung spasi setelah @
+            // Hanya tampilkan saran jika setelah '@' belum ada spasi
             if (!query.includes(' ')) {
                  showMentionSuggestions(query);
             } else {
