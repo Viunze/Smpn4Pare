@@ -1,79 +1,158 @@
-<!DOCTYPE html>
+<!DOCTYPEYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8"><script>
-    // KRITIS: Pastikan URL ini menunjuk ke Railway
-    const SERVER_URL = 'https://smpn4pare-production.up.railway.app'; 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Registrasi Forum</title>
+    </head>
+<body>
 
-    const displayStatus = (id, message, type) => {
-        // ... (Kode displayStatus Anda)
-    };
+    <div id="auth-container">
+        <h1>Forum Chat SMPN 4 Pare</h1>
 
-    // --- Handle Registrasi ---
-    document.getElementById('register-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        // ... (Payload Anda)
-        const payload = {
-            nama_lengkap: document.getElementById('reg-nama').value,
-            username: document.getElementById('reg-username').value,
-            password: document.getElementById('reg-password').value,
-            kelas: document.getElementById('reg-kelas').value
+        <form id="register-form">
+            <h2>Registrasi Siswa Baru</h2>
+            <div id="register-message"></div>
+            <input type="text" id="reg-nama" placeholder="Nama Lengkap" required>
+            <input type="text" id="reg-username" placeholder="NISN/NIS (Username)" required>
+            <input type="password" id="reg-password" placeholder="Password" required>
+            
+            <select id="reg-kelas" required>
+                <option value="" disabled selected>Pilih Kelas</option>
+                <option value="7A">7A</option>
+                <option value="7B">7B</option>
+                <option value="8A">8A</option>
+                <option value="9A">9A</option>
+                </select>
+            
+            <button type="submit">Daftar</button>
+        </form>
+
+        <hr>
+
+        <form id="login-form">
+            <h2>Login</h2>
+            <div id="login-message"></div>
+            <input type="text" id="log-username" placeholder="Username (NISN/NIS)" required>
+            <input type="password" id="log-password" placeholder="Password" required>
+            <button type="submit">Masuk</button>
+        </form>
+    </div>
+
+
+    <script>
+        // KRITIS: Pastikan URL ini menunjuk ke Railway Backend Anda
+        const SERVER_URL = 'https://smpn4pare-production.up.railway.app'; 
+
+        const displayStatus = (id, message, type) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = message;
+                element.className = `status-${type}`; // status-success atau status-error
+            }
         };
 
-        try {
-            const response = await fetch(`${SERVER_URL}/api/auth/register`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
+        // --- Handle Registrasi ---
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            displayStatus('register-message', '', ''); // Clear status
+            
+            const payload = {
+                nama_lengkap: document.getElementById('reg-nama').value,
+                username: document.getElementById('reg-username').value,
+                password: document.getElementById('reg-password').value,
+                kelas: document.getElementById('reg-kelas').value
+            };
 
-            // Logika validasi respons (sama seperti sebelumnya, memastikan respons bukan HTML error)
-            const contentType = response.headers.get('content-type');
-            let data = {};
-            // ... (Logika penanganan non-JSON)
-            if (contentType && contentType.includes('application/json')) {
-                data = await response.json();
-            } else {
-                const text = await response.text();
-                // Jika server tidak OK, kita berasumsi ada pesan error di text/data
-                try {
-                    data = JSON.parse(text); 
-                } catch (e) {
-                    data.msg = `Registrasi gagal. Server merespons tidak terduga. (Status: ${response.status})`;
-                }
-            }
-            // ... (Akhir logika penanganan non-JSON)
+            try {
+                const response = await fetch(`${SERVER_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            if (response.ok) {
-                // KRITIS: Periksa apakah token dan user ada di respons backend
-                if (data.token && data.user) {
-                    displayStatus('register-message', 'Registrasi Berhasil! Mengalihkan ke forum.', 'success');
-                    
-                    // LINGKARAN MERAH SUDAH DIHENTIKAN DI SINI:
-                    localStorage.setItem('token', data.token);
-                    localStorage.setItem('user', JSON.stringify(data.user));
-                    
-                    setTimeout(() => {
-                        window.location.href = 'chat_forum.html'; 
-                    }, 1500);
-
+                const contentType = response.headers.get('content-type');
+                let data = {};
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
                 } else {
-                    // Jika registrasi OK tapi token hilang, hentikan redirect.
-                    displayStatus('register-message', 'Registrasi OK, tapi data sesi hilang. Cek backend!', 'error');
-                    console.error('SERVER ERROR: Token atau user hilang di respons 200 OK.');
+                    const text = await response.text();
+                    try {
+                        data = JSON.parse(text); 
+                    } catch (e) {
+                        data.msg = `Registrasi gagal. Server merespons tidak terduga. (Status: ${response.status})`;
+                    }
                 }
-            } else {
-                // LOGIKA GAGAL (Response status 4xx/5xx)
-                displayStatus('register-message', data.msg || 'Registrasi gagal. Username mungkin sudah terdaftar.', 'error');
+
+                if (response.ok) {
+                    // KRITIS: Periksa apakah token dan user ada di respons backend
+                    if (data.token && data.user) {
+                        displayStatus('register-message', 'Registrasi Berhasil! Mengalihkan ke forum.', 'success');
+                        
+                        // Hentikan Looping Domain dengan menyimpan sesi
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        
+                        setTimeout(() => {
+                            window.location.href = 'chat_forum.html'; 
+                        }, 1500);
+
+                    } else {
+                        displayStatus('register-message', 'Registrasi OK, tapi data sesi hilang. Cek Backend!', 'error');
+                        console.error('SERVER ERROR: Token atau user hilang di respons 200 OK.');
+                    }
+                } else {
+                    displayStatus('register-message', data.msg || 'Registrasi gagal. Coba cek data Anda.', 'error');
+                }
+
+            } catch (err) {
+                console.error('Network or connection error:', err);
+                displayStatus('register-message', 'Terjadi kesalahan koneksi server atau jaringan.', 'error');
             }
+        });
 
-        } catch (err) {
-            // ... (Logika penanganan error jaringan/CORS)
-        }
-    });
+        // --- Handle Login ---
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            displayStatus('login-message', '', ''); // Clear status
 
-    // --- Handle Login (Harusnya juga diperbaiki) ---
-    document.getElementById('login-form').addEventListener('submit', async (e) => {
-        // ... Logika login Anda di sini (Pastikan login juga menyimpan token/user)
-    });
-</script>
+            const payload = {
+                username: document.getElementById('log-username').value,
+                password: document.getElementById('log-password').value
+            };
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.token && data.user) {
+                        displayStatus('login-message', 'Login Berhasil! Mengalihkan ke forum.', 'success');
+                        
+                        localStorage.setItem('token', data.token);
+                        localStorage.setItem('user', JSON.stringify(data.user));
+                        
+                        setTimeout(() => {
+                            window.location.href = 'chat_forum.html'; 
+                        }, 1500);
+                    } else {
+                         displayStatus('login-message', 'Login OK, tapi data sesi hilang. Cek Backend!', 'error');
+                    }
+                } else {
+                    displayStatus('login-message', data.msg || 'Login gagal. Cek username/password.', 'error');
+                }
+
+            } catch (err) {
+                console.error('Network or connection error:', err);
+                displayStatus('login-message', 'Terjadi kesalahan koneksi server atau jaringan.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
