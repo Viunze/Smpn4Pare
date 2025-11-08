@@ -1,63 +1,61 @@
-// chat_app/server/routes/auth.js (FULL CODE UPDATED)
+// chat_app/server/routes/auth.js
+// Asumsi Anda menggunakan router Express dan jwt.
 const express = require('express');
+const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
 
-const router = express.Router();
+// Pastikan model User sudah terimpor
+const User = require('../models/User'); // Ganti path sesuai struktur Anda
 
-// Middleware sederhana untuk melindungi route yang membutuhkan login
-const auth = (req, res, next) => {
-    // Ambil token dari header
-    const token = req.header('x-auth-token');
+const JWT_SECRET = process.env.JWT_SECRET || 'ganti_dengan_secret_kuat'; // Harus sama dengan secret yang Anda gunakan
 
-    // Cek jika tidak ada token
-    if (!token) {
-        return res.status(401).json({ msg: 'Tidak ada token, otorisasi ditolak' });
-    }
-
-    // Verifikasi token
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded.user;
-        next();
-    } catch (e) {
-        res.status(401).json({ msg: 'Token tidak valid' });
-    }
-};
-
-// =================================================================
-// 1. ROUTE REGISTRASI SISWA BARU
-// =================================================================
+// Endpoint Registrasi
 router.post('/register', async (req, res) => {
     const { nama_lengkap, username, password, kelas } = req.body;
-    // Validasi input disarankan di sini
 
     try {
+        // 1. Cek apakah pengguna sudah ada
         let user = await User.findOne({ username });
         if (user) {
-            return res.status(400).json({ msg: 'Username sudah digunakan.' });
+            return res.status(409).json({ msg: 'Username (NISN/NIS) sudah terdaftar.' });
         }
 
-        user = new User({ nama_lengkap, username, password, kelas });
-
+        // 2. Buat pengguna baru
         const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(password, salt);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        user = new User({
+            nama_lengkap,
+            username,
+            password: hashedPassword,
+            kelas
+        });
+
         await user.save();
 
+        // 3. GENERATE TOKEN dan kirim kembali data pengguna
         const payload = {
-            user: { id: user.id, kelas: user.kelas, nama: user.nama_lengkap }
+            user: { id: user.id }
         };
 
-        jwt.sign(
-            payload,
-            process.env.JWT_SECRET, 
-            { expiresIn: '5h' },
-            (err, token) => {
-                if (err) throw err;
-                res.json({ token, user: payload.user });
-            }
-        );
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
+
+        // KRITIS: Mengirim token dan objek user
+        // Hapus password hash dari objek user sebelum dikirim ke frontend
+        const userResponse = {
+            _id: user._id,
+            nama_lengkap: user.nama_lengkap,
+            username: user.username,
+            kelas: user.kelas
+        };
+
+        // Respon sukses dengan TOKEN dan data USER
+        res.status(201).json({ 
+            msg: 'Registrasi Berhasil!', 
+            token, // <-- Pastikan ini ada
+            user: userResponse // <-- Pastikan ini ada
+        });
 
     } catch (err) {
         console.error(err.message);
@@ -65,12 +63,10 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// =================================================================
-// 2. ROUTE LOGIN SISWA
-// =================================================================
+// Endpoint Login (Pastikan ini juga mengembalikan token dan user)
 router.post('/login', async (req, res) => {
+    // ... Logika login Anda di sini, yang juga harus merespons dengan token dan user
     const { username, password } = req.body;
-
     try {
         let user = await User.findOne({ username });
         if (!user) {
@@ -81,35 +77,20 @@ router.post('/login', async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ msg: 'Kredensial tidak valid' });
         }
+        
+        // Generate Token
+        const payload = { user: { id: user.id } };
+        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '1h' });
 
-        const payload = {
-            user: { id: user.id, kelas: user.kelas, nama: user.nama_lengkap }
+        const userResponse = {
+            _id: user._id,
+            nama_lengkap: user.nama_lengkap,
+            username: user.username,
+            kelas: user.kelas
         };
 
-        jwt.sign(
-            payload,
-            process.env.JWT_SECRET,
-            { expiresIn: '5h' },
-            (err, token) => {
-                if (err) throw err;
-                res.json({ token, user: payload.user });
-            }
-        );
+        res.json({ token, user: userResponse });
 
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server Error');
-    }
-});
-
-// =================================================================
-// 3. ROUTE AMBIL SEMUA USER (Dibutuhkan untuk Fitur Tagging)
-// =================================================================
-router.get('/users', auth, async (req, res) => {
-    try {
-        // Ambil semua user, tapi HANYA field yang dibutuhkan (nama, kelas, ID)
-        const users = await User.find().select('nama_lengkap kelas username'); 
-        res.json({ users });
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
