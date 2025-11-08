@@ -1,0 +1,12 @@
+{
+  "routes": [
+    {
+      "src": "/chat-forum",
+      "dest": "/chat-forum/index.html"
+    },
+    {
+      "src": "/chat-forum/(.*)",
+      "dest": "/chat-forum/$1"
+    }
+  ]
+}
