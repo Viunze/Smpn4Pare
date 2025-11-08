@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Registrasi - Chat Forum SMPN 4 Pare</title>
+    <link rel="stylesheet" href="../style.css"> 
+    <style>
+        /* CSS Khusus untuk Halaman Login/Reg */
+        .auth-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 40px;
+            background-color: #f9f9f9;
+        }
+        .auth-box {
+            flex: 1;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: white;
+        }
+        .auth-box h3 {
+            margin-top: 0;
+            color: #1E8449; /* Warna hijau SMPN 4 */
+            border-bottom: 2px solid #D4AC0D;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        #register-btn {
+            background-color: #1E8449;
+            color: white;
+        }
+        #register-btn:hover {
+            background-color: #156535;
+        }
+        #login-btn {
+            background-color: #D4AC0D;
+            color: black;
+        }
+        #login-btn:hover {
+            background-color: #b7950b;
+        }
+        .message-output {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            display: none;
+            font-weight: bold;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        </header>
+
+    <div class="auth-container">
+        <div class="auth-box" id="register-box">
+            <h3>Registrasi Siswa Baru</h3>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="reg-nama">Nama Lengkap</label>
+                    <input type="text" id="reg-nama" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-username">Username (NISN/NIS)</label>
+                    <input type="text" id="reg-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="reg-kelas">Kelas</label>
+                    <select id="reg-kelas" required>
+                        <option value="">Pilih Kelas</option>
+                        <option value="VII A">VII A</option>
+                        <option value="VII B">VII B</option>
+                        <option value="VIII A">VIII A</option>
+                        <option value="VIII B">VIII B</option>
+                        <option value="IX A">IX A</option>
+                        </select>
+                </div>
+                <button type="submit" id="register-btn">Registrasi</button>
+            </form>
+            <div id="register-message" class="message-output"></div>
+        </div>
+
+        <div class="auth-box" id="login-box">
+            <h3>Login Chat Forum</h3>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-username">Username (NISN/NIS)</label>
+                    <input type="text" id="login-username" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <button type="submit" id="login-btn">Login</button>
+            </form>
+            <div id="login-message" class="message-output"></div>
+        </div>
+    </div>
+    
+    <script src="chat.js"></script> 
+    <script>
+        // Logika Form di halaman login/register
+        const SERVER_URL = 'https://smpn4pare-production.up.railway.app'; 
+
+        // Fungsi Tampilkan Pesan Status
+        const displayStatus = (id, message, type) => {
+            const output = document.getElementById(id);
+            output.textContent = message;
+            output.className = `message-output ${type}`;
+            output.style.display = 'block';
+        };
+
+        // --- Handle Registrasi ---
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                nama_lengkap: document.getElementById('reg-nama').value,
+                username: document.getElementById('reg-username').value,
+                password: document.getElementById('reg-password').value,
+                kelas: document.getElementById('reg-kelas').value
+            };
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayStatus('register-message', 'Registrasi Berhasil! Silakan Login.', 'success');
+                    // Simpan token dan user info
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    setTimeout(() => {
+                        window.location.href = 'chat_forum.html'; 
+                    }, 1500);
+
+                } else {
+                    displayStatus('register-message', data.msg || 'Registrasi gagal.', 'error');
+                }
+            } catch (err) {
+                displayStatus('register-message', 'Terjadi kesalahan koneksi server.', 'error');
+                console.error('Error:', err);
+            }
+        });
+
+        // --- Handle Login ---
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                username: document.getElementById('login-username').value,
+                password: document.getElementById('login-password').value,
+            };
+
+            try {
+                const response = await fetch(`${SERVER_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayStatus('login-message', 'Login Berhasil! Mengarahkan ke forum...', 'success');
+                    // Simpan token dan user info
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    setTimeout(() => {
+                        window.location.href = 'chat_forum.html'; 
+                    }, 1500);
+
+                } else {
+                    displayStatus('login-message', data.msg || 'Username atau password salah.', 'error');
+                }
+            } catch (err) {
+                displayStatus('login-message', 'Terjadi kesalahan koneksi server.', 'error');
+                console.error('Error:', err);
+            }
+        });
+
+        // Cek jika sudah login, langsung redirect ke chat
+        if (localStorage.getItem('token')) {
+             window.location.href = 'chat_forum.html'; 
+        }
+    </script>
+</body>
+</html>
