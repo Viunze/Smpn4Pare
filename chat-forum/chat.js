@@ -1,7 +1,4 @@
 // chat-forum/chat.js
-// Logika otentikasi, koneksi Socket.IO, dan penanganan pesan untuk Chat Forum.
-
-// KRITIS: Pastikan URL ini menunjuk ke Railway Backend Anda
 const SERVER_URL = 'https://smpn4pare-production.up.railway.app'; 
 
 let socket;
@@ -14,25 +11,29 @@ let token;
 // =================================================================
 
 function checkAuthAndInitialize() {
-    // Ambil token dan data pengguna dari Local Storage
     token = localStorage.getItem('token');
     const userJson = localStorage.getItem('user');
 
     if (!token || !userJson) {
-        // Jika tidak ada token, alihkan ke halaman login/register
+        // Jika token hilang, alihkan ke login/register
+        console.warn('AUTH CHECK FAILED: Token or User data missing. Redirecting to index.html.');
         window.location.href = 'index.html';
-        return; // Mengakhiri eksekusi di sini
+        return; 
     }
 
     try {
+        console.log('AUTH CHECK SUCCESS: Token and User data found. Parsing...');
+        
+        // Coba parsing data user
         currentUser = JSON.parse(userJson);
         currentKelas = currentUser.kelas;
         
-        // Inisialisasi tampilan chat dan koneksi
+        console.log('User parsed successfully:', currentUser.username, 'Initializing chat...');
         initializeChatApp();
+
     } catch (e) {
-        // Jika data user rusak, hapus dan alihkan
-        console.error("Data pengguna rusak, mengalihkan ke login.", e);
+        // Jika parsing gagal (data rusak), clear storage dan alihkan
+        console.error('ERROR PARSING USER DATA. Clearing storage and redirecting:', e);
         localStorage.clear();
         window.location.href = 'index.html';
     }
@@ -43,18 +44,22 @@ function initializeChatApp() {
     document.getElementById('user-info').textContent = 
         `${currentUser.nama_lengkap} (${currentKelas})`;
 
+    // KRITIS: Cek apakah io tersedia
+    if (typeof io === 'undefined') {
+        // Jika kode mencapai sini, berarti <script src="socket.io.min.js"> HILANG/GAGAL di chat_forum.html
+        console.error('FATAL ERROR: Socket.IO library (io) is not loaded in chat_forum.html!');
+        displaySystemMessage('Kesalahan fatal: Pustaka chat (Socket.IO) tidak dimuat. Cek Console.');
+        return; 
+    }
+    
+    console.log('Connecting to Socket.IO at:', SERVER_URL);
     // Hubungkan ke Socket.IO
     socket = io(SERVER_URL, {
         query: { token: token } // Mengirim token untuk otentikasi Socket.IO
     });
 
-    // Event handler Socket.IO
     setupSocketListeners();
-
-    // Event handler formulir kirim pesan
-    document.getElementById('send-form').addEventListener('submit', handleSendMessage);
 }
-
 
 // =================================================================
 // 2. LOGIKA SOCKET.IO LISTENERS
@@ -63,53 +68,55 @@ function initializeChatApp() {
 function setupSocketListeners() {
     socket.on('connect', () => {
         console.log('Terkoneksi ke server chat:', socket.id);
-        // Bergabung ke ruangan sesuai kelas
         socket.emit('joinRoom', currentKelas);
     });
 
     socket.on('disconnect', () => {
         console.log('Terputus dari server.');
+        displaySystemMessage('Koneksi terputus. Mencoba menghubungkan kembali...');
     });
 
     socket.on('connect_error', (err) => {
         console.error('Kesalahan koneksi Socket.IO:', err.message);
-        displaySystemMessage('Gagal terhubung ke chat. Server mungkin sedang offline.');
+        displaySystemMessage('Gagal terhubung ke chat. Server mungkin sedang offline atau masalah CORS.');
     });
 
     socket.on('receiveMessage', handleReceiveMessage);
 }
 
 // =================================================================
-// 3. LOGIKA PENANGANAN PESAN
+// 3. LOGIKA PENANGANAN PESAN & UTILITY
 // =================================================================
 
 function handleSendMessage(e) {
     e.preventDefault();
+    // ... (Logika kirim pesan)
     const input = document.getElementById('message-input');
     const content = input.value.trim();
 
     if (content) {
         const msgData = {
-            senderId: currentUser._id,
+            sender: {
+                id: currentUser._id,
+                name: currentUser.nama_lengkap,
+                kelas: currentKelas
+            },
             content: content,
-            kelas: currentKelas,
-            // replyToId, mentions, dll. (Tambahkan jika diperlukan)
+            timestamp: new Date().toISOString()
         };
 
-        // Kirim pesan ke server
         socket.emit('sendMessage', msgData);
         input.value = '';
     }
 }
 
 function handleReceiveMessage(msg) {
+    // ... (Logika terima pesan)
     const chatBox = document.getElementById('chat-messages');
     
-    // Asumsi msg memiliki struktur yang diharapkan dari backend (nama, konten, timestamp)
     const msgElement = document.createElement('div');
     msgElement.className = 'chat-message';
     
-    // Tentukan apakah pesan ini milik pengguna saat ini
     const isCurrentUser = msg.sender.id === currentUser._id;
     if (isCurrentUser) {
         msgElement.classList.add('self-message');
@@ -127,7 +134,6 @@ function handleReceiveMessage(msg) {
     `;
 
     chatBox.appendChild(msgElement);
-    // Gulir ke bawah agar pesan terbaru terlihat
     chatBox.scrollTop = chatBox.scrollHeight;
 }
 
@@ -142,7 +148,7 @@ function displaySystemMessage(message) {
 
 
 // =================================================================
-// 4. INVOCATION (PANGGILAN UTAMA)
+// 4. INVOCATION
 // =================================================================
 
 // Panggil fungsi otentikasi saat script dimuat
