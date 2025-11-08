@@ -3,193 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Forum Siswa SMPN 4 Pare</title>
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <title>Chat Forum - SMPN 4 Pare</title>
+    <link rel="stylesheet" href="../style.css"> 
     <style>
-        /* Desain dasar yang bersih, adaptasi dari WhatsApp/Discord */
+        /* CSS Khusus untuk Chat Forum */
         body {
-            font-family: Arial, sans-serif;
+            font-family: sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
             margin: 0;
-            background-color: #f0f2f5;
+            padding: 0;
         }
-        .chat-app {
-            display: flex;
-            height: 100vh;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #ffffff;
-            border-right: 1px solid #ddd;
-            padding: 20px;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
-            overflow-y: auto;
-        }
-        .sidebar h2 {
-            color: #1E8449;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #D4AC0D;
-            padding-bottom: 10px;
-        }
-        .user-list-item {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            color: #555;
-            font-size: 0.9em;
-        }
-        .user-class {
-            font-weight: bold;
-            color: #008069;
-        }
-        .chat-main {
-            flex-grow: 1;
+        .chat-container {
+            max-width: 900px;
+            height: 80vh; /* Tinggi viewport 80% */
+            margin: 50px auto;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+            background-color: white;
         }
         .chat-header {
-            background-color: #1E8449;
+            background-color: #1E8449; /* Hijau Sekolah */
             color: white;
             padding: 15px 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 2px solid #D4AC0D;
         }
-        .chat-header button {
-            background: none;
-            color: white;
-            border: 1px solid white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
+        .chat-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .user-info {
+            font-size: 0.9em;
+            opacity: 0.8;
         }
         #chat-messages {
             flex-grow: 1;
             padding: 20px;
             overflow-y: auto;
-            background-color: #f9f9f9;
+            background-color: #fcfcfc;
+            border-bottom: 1px solid #eee;
         }
-        .message {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 8px;
-            max-width: 60%;
-            position: relative;
-        }
-        .message-sent {
-            background-color: #DCF8C6; /* Hijau muda ala WA */
-            margin-left: auto;
-            align-self: flex-end;
-            text-align: right;
-        }
-        .message-received {
-            background-color: #ffffff;
-            margin-right: auto;
-        }
-        .message-sender {
-            font-size: 0.8em;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 4px;
-        }
-        .message-timestamp {
-            font-size: 0.7em;
-            color: #888;
-            display: block;
-            margin-top: 5px;
-            text-align: right;
-        }
-        .reply-box {
-            padding: 5px; 
-            background: #eee; 
-            border-left: 3px solid #D4AC0D; 
-            margin-bottom: 5px;
-            border-radius: 4px;
-        }
-        .chat-input {
+        .message-input-area {
             padding: 15px 20px;
-            background-color: #ffffff;
-            border-top: 1px solid #ddd;
+            background-color: #f4f4f9;
             display: flex;
-            align-items: center;
-            position: relative;
+            gap: 10px;
         }
         #message-input {
             flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
+            padding: 12px;
+            border: 1px solid #ddd;
             border-radius: 20px;
-            margin-right: 10px;
             font-size: 1em;
         }
-        #message-input.reply-mode {
-            background-color: #fffacd; /* Warna kuning muda saat mode reply */
-        }
-        #send-button {
-            background-color: #008069;
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            text-align: center;
-            font-size: 1.2em;
-        }
-        #mention-suggestions {
-             /* Pastikan styling ini ada di file chat.js atau di sini */
-            position: absolute;
-            z-index: 1000;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            display: none;
-            max-height: 200px;
-            overflow-y: auto;
-            width: 250px;
-        }
-        .mention-item {
-            padding: 8px;
+        #send-btn {
+            background-color: #D4AC0D; /* Kuning */
+            color: black;
+            padding: 12px 20px;
+            border-radius: 20px;
+            border: none;
+            font-weight: bold;
             cursor: pointer;
-            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
         }
-        .mention-item:hover {
-            background-color: #f0f0f0;
+        #send-btn:hover {
+            background-color: #b7950b;
+        }
+
+        /* Gaya Pesan */
+        .chat-message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 10px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        .self-message {
+            background-color: #E6F7D4; /* Hijau muda untuk pesan sendiri */
+            align-self: flex-end;
+            margin-left: auto;
+            text-align: right;
+        }
+        .other-message {
+            background-color: #f0f0f0; /* Abu-abu muda untuk pesan lain */
+            align-self: flex-start;
+        }
+        .message-header {
+            font-size: 0.8em;
+            margin-bottom: 3px;
+        }
+        .sender-name {
+            font-weight: bold;
+            color: #1E8449;
+        }
+        .timestamp {
+            font-size: 0.75em;
+            color: #999;
+            margin-left: 10px;
+        }
+        .system-message {
+            text-align: center;
+            margin: 15px 0;
+            color: #888;
+            font-style: italic;
+            font-size: 0.9em;
         }
     </style>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
-    <div class="chat-app">
-        <div class="sidebar">
-            <h2>Chat Forum</h2>
-            <div id="user-list">
-                </div>
-            <p style="margin-top: 20px; font-size: 0.8em; color: #777;">
-                *Klik kanan pada pesan untuk membalas.<br>
-                *Ketik '@' untuk tag siswa lain.
-            </p>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>Chat Forum Kelas</h2>
+            <div class="user-info" id="user-info">Memuat sesi...</div>
         </div>
 
-        <div class="chat-main">
-            <div class="chat-header">
-                <h3>Forum Siswa SMPN 4 Pare</h3>
-                <button id="logout-button">Logout</button>
+        <div id="chat-messages">
+            <div class="system-message">Selamat datang di Chat Forum SMPN 4 Pare.</div>
             </div>
-            <div id="chat-messages">
-                </div>
-            <div class="chat-input">
-                <input type="text" id="message-input" placeholder="Ketik pesan Anda di sini...">
-                <button id="send-button">➤</button>
-                </div>
-        </div>
+
+        <form id="send-form" class="message-input-area">
+            <input type="text" id="message-input" placeholder="Ketik pesan Anda..." required>
+            <button type="submit" id="send-btn">Kirim</button>
+        </form>
     </div>
 
-    <script src="chat.js"></script>
-    <script>
-        document.getElementById('logout-button').addEventListener('click', () => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'index.html'; // Kembali ke halaman login/register
-        });
-    </script>
+    <script src="chat.js"></script> 
 </body>
 </html>
